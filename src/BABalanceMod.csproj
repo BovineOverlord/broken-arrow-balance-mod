@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>BABalanceMod</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
+    <!-- Path to your Broken Arrow install. Either edit this line, or override it
+         on the command line:  dotnet build -c Release -p:GameDir="D:\Games\Broken Arrow" -->
+    <GameDir Condition="'$(GameDir)' == ''">D:\Games\Broken Arrow</GameDir>
+    <ML>$(GameDir)\MelonLoader\net6</ML>
+    <IL2>$(GameDir)\MelonLoader\Il2CppAssemblies</IL2>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="BalanceMod.cs" />
+  </ItemGroup>
+
+  <!-- These assemblies are generated the first time you launch the game with
+       MelonLoader installed. See docs/MODDING.md. -->
+  <ItemGroup>
+    <Reference Include="MelonLoader"><HintPath>$(ML)\MelonLoader.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(ML)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(ML)\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>$(ML)\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><HintPath>$(IL2)\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppSystem"><HintPath>$(IL2)\Il2CppSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppBrokenArrow"><HintPath>$(IL2)\Il2CppBrokenArrow.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppNetworkCommon"><HintPath>$(IL2)\Il2CppNetworkCommon.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(IL2)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

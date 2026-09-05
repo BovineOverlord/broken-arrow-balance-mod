@@ -1,0 +1,81 @@
+{
+ "_note": "Generated from changelog where it maps cleanly. Edit freely. unit fields: Cost,HP,ArmorValue,KinF,KinS,KinR,KinT,HeatF,HeatS,HeatR,HeatT. ammo fields: Damage,PenMin,PenGround,SupplyCost,ResupplyTime",
+ "units": [
+  {
+   "id": 147,
+   "name": "CAAT TOW-2A",
+   "Cost": 100
+  },
+  {
+   "id": 117,
+   "name": "Ingenery-Shturmoviki",
+   "Cost": 70
+  },
+  {
+   "id": 232,
+   "name": "2S35 Koalitsiya-SV",
+   "Cost": 225
+  },
+  {
+   "id": 395,
+   "name": "RQ-170 Sentinel",
+   "Cost": 200
+  },
+  {
+   "id": 276,
+   "name": "Pararescue",
+   "Cost": 70
+  },
+  {
+   "id": 471,
+   "name": "UR-77 Meteorit",
+   "Cost": 90
+  },
+  {
+   "id": 159,
+   "name": "UH-1Y Venom",
+   "Cost": 70
+  },
+  {
+   "id": 390,
+   "name": "MTV",
+   "Cost": 55
+  },
+  {
+   "id": 84,
+   "name": "MTVR",
+   "Cost": 65
+  },
+  {
+   "id": 242,
+   "name": "HEMTT",
+   "Cost": 75
+  },
+  {
+   "id": 126,
+   "name": "Morskaya pekhota",
+   "Cost": 75
+  },
+  {
+   "id": 401,
+   "name": "Shturmoviki",
+   "Cost": 55
+  },
+  {
+   "id": 240,
+   "name": "BMPT Terminator",
+   "Cost": 190
+  },
+  {
+   "id": 389,
+   "name": "SLAMRAAM",
+   "Cost": 100
+  },
+  {
+   "id": 346,
+   "name": "Spetsnaz GRU AT",
+   "Cost": 145
+  }
+ ],
+ "ammunitions": []
+}
