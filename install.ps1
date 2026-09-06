@@ -38,7 +38,7 @@ function Info($m){ Write-Host "[*]  $m" -ForegroundColor Cyan }
 function Ok($m){   Write-Host "[OK] $m" -ForegroundColor Green }
 function Warn($m){ Write-Host "[!]  $m" -ForegroundColor Yellow }
 function Die($m){  Write-Host "[X]  $m" -ForegroundColor Red; Write-Host ''; Read-Host 'Press Enter to close'; exit 1 }
-function Test-GameDir($d){ return ($d -and (Test-Path (Join-Path $d 'BrokenArrow.exe'))) }
+function Test-GameDir($d){ if (-not $d) { return $false }; return [bool](Test-Path -LiteralPath ("$d\BrokenArrow.exe") -ErrorAction SilentlyContinue) }
 
 function Find-Game {
   if (Test-GameDir $GameDir) { return (Resolve-Path $GameDir).Path }
