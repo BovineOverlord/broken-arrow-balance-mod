@@ -1,18 +1,16 @@
-# Modding guide — BA Balance Mod
+# Modding guide: BA Balance Mod
 
 This document explains how the mod works, how to add new editable fields, and how to build it from source.
 It's written so another modder can reproduce and extend everything.
 
 ## How it works
 
-Broken Arrow's per-unit stats (HP, armour, price, weapon damage, penetration, …) are **not** stored as
-normal Unity data. They live inside a single Resources asset, `DataBaseCompiled`, as encrypted binary
-blobs (custom container, magic bytes `fhk3s0g3`, ~8.0 bits/byte entropy — effectively random). No standard
-decompressor touches it, and decrypting it on disk would mean reverse-engineering the game's own crypto out
-of native `GameAssembly.dll` — exactly what the anti-tamper is built to resist.
+Broken Arrow's per-unit stats (HP, armour, price, weapon damage, penetration, and so on) are **not** stored
+as normal Unity data. They live inside a single Resources asset, `DataBaseCompiled`, which ships encrypted
+on disk, so editing the file directly is a dead end.
 
-The trick this mod uses is to **not** fight the encryption at all. The game itself decrypts the database at
-runtime into plain model objects with public setters. So the mod:
+You don't have to. The game decrypts the database into plain model objects with public setters at runtime,
+so the mod leaves the file alone and works with those live objects instead. On each launch it:
 
 1. waits for `BrokenArrow.Shared.Ecs.DataBaseService._instance` to report `IsLoaded`,
 2. reads your `overrides.json`,
@@ -60,7 +58,7 @@ The mapping from JSON keys to game fields lives in `src/BalanceMod.cs`:
 - `VI()` reads an int, `VF()` reads a float, `Has()` checks a key is present. Use whichever matches the
   property type.
 
-Weapons, mobility, sensors and abilities are reached from a unit or by id in the same way — wire them into
+Weapons, mobility, sensors and abilities are reached from a unit or by id in the same way, wire them into
 a new `ApplyX()` and a new JSON section following the existing pattern.
 
 ## Building from source
@@ -70,7 +68,7 @@ a new `ApplyX()` and a new JSON section following the existing pattern.
 - Windows, with the game installed.
 - [.NET SDK 6.0 or newer](https://dotnet.microsoft.com/download) (`dotnet --version` to check).
 - MelonLoader installed in the game folder, and the game launched **once** modded. That first launch
-  generates `MelonLoader\Il2CppAssemblies\` — the game's IL2CPP code as regular .NET assemblies, which this
+  generates `MelonLoader\Il2CppAssemblies\`, the game's IL2CPP code as regular .NET assemblies, which this
   project references. (Running `install.bat` from the repo root installs MelonLoader for you.)
 
 **Build**
@@ -83,17 +81,17 @@ Point `-p:GameDir` at your own install (or edit the default `<GameDir>` line in 
 The output `BABalanceMod.dll` lands in `src\bin\Release\`. Copy it into the game's `Mods\` folder, or just
 overwrite `dist\BABalanceMod.dll` and re-run `install.bat`.
 
-## Reverse-engineering recipe (for a fresh game build)
+## Rebuilding against a new game patch
 
 If a game patch shifts things, this is the reproducible path that got here:
 
 1. Install MelonLoader (IL2CPP build) into the game folder; launch once to generate `Il2CppAssemblies`.
 2. The gameplay database is `BrokenArrow.Shared.Ecs.DataBaseService` (singleton `_instance`), exposing
    `GetUnitById`, `GetAllUnits`, `GetAmmunitionById`, `GetOptionById`. The on-disk `DataBaseCompiled` is
-   encrypted, but the game decrypts it into `BrokenArrow.DataBase.Models.*` objects with public setters —
+   encrypted, but the game decrypts it into `BrokenArrow.DataBase.Models.*` objects with public setters , 
    edit those at runtime.
 3. Poll `DataBaseService._instance.IsLoaded` in `OnUpdate`. Don't Harmony-hook the loader (it's inlined),
-   and don't enumerate the Il2Cpp collections directly (that crashes) — look items up by id.
+   and don't enumerate the Il2Cpp collections directly (that crashes), look items up by id.
 4. Build against the interop assemblies and drop the DLL in `Mods\`.
 
 ## Notes
