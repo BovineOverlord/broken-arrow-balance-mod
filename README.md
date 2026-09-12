@@ -8,10 +8,15 @@ back to stock.
 > well.** Install both. Local Skirmish is what gives you a working offline battle to actually play your
 > rebalanced stats in.
 
-> **Single-player / offline only.** Modified stats do not work in official multiplayer (the stat database is
-> server-authoritative online and the client is integrity-checked), and you shouldn't try to use them there.
-> This is a tool for offline play and experimentation. It's a fan-made mod, not affiliated with or endorsed
-> by the developers or publisher of Broken Arrow.
+> ## ⚠️ Single-player / offline only — going online with mods can get you BANNED
+> Modified stats are **server-checked** in official multiplayer, and the client is integrity-checked. Playing
+> online with the mod active is detectable and **can get your account banned** (Skirmish is online by default —
+> that's what the [Local Skirmish mod](https://github.com/BovineOverlord/broken-arrow-local-skirmish) makes
+> offline). Rules: launch **only** with the "Broken Arrow (Modded)" shortcut (anti-cheat off, so you're never
+> online with mods); **never** use Steam **Play**/`EACLauncher.exe` while the DLL is in `Mods\`; to play real
+> online multiplayer, **remove `Mods\BABalanceMod.dll` first**. As a safety net the mod also refuses to apply
+> any overrides if it detects EasyAntiCheat loaded. It's a fan-made mod, not affiliated with or endorsed by the
+> developers or publisher of Broken Arrow.
 
 ---
 
@@ -26,14 +31,18 @@ That's it. The installer will:
 - download and install **MelonLoader v0.7.3** into the game folder for you if it isn't already there,
 - copy the mod into `Mods\`,
 - create `_BAMod\overrides.json` (the file you edit) if you don't already have one,
+- write `steam_appid.txt` + a Steam-aware launcher (so the game doesn't hang at "Loading Hangar"),
 - and add a **"Broken Arrow (Modded)"** desktop shortcut.
 
 Do the same with the **[Local Skirmish mod](https://github.com/BovineOverlord/broken-arrow-local-skirmish)**,
 which is also required. Then launch the game with the new desktop shortcut and you're modded.
 
 > **Why a special shortcut?** Broken Arrow's normal Steam launch runs through EasyAntiCheat, which blocks
-> mods. The shortcut starts `BrokenArrow.exe` directly with anti-cheat off, which is required for any
-> MelonLoader mod to load. The first modded launch is slower because MelonLoader sets itself up once.
+> mods. The shortcut starts the game with anti-cheat off (required for any MelonLoader mod to load) but still
+> with a Steam context — the installer writes `steam_appid.txt` and the launcher makes sure the Steam client
+> is running first. Without that context the game hangs at the "Loading Hangar" screen, so **keep Steam running
+> and signed in** when you launch modded. The first modded launch is slower because MelonLoader sets itself up
+> once.
 
 ## How to change stats
 

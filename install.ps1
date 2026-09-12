@@ -8,8 +8,10 @@
        already there - downloaded straight from the official MelonLoader release
     3. Copies the mod into  <game>\Mods\
     3b. Seeds  _BAMod\overrides.json  (the file you edit) if you don't have one
-    4. Creates a "Broken Arrow (Modded)" desktop shortcut that launches the
-       game WITHOUT EasyAntiCheat (required for mods to load)
+    4. Writes steam_appid.txt + a Steam-aware launcher, and creates a
+       "Broken Arrow (Modded)" desktop shortcut that launches the game WITHOUT
+       EasyAntiCheat (required for mods) but WITH a Steam context (so it doesn't
+       hang at "Loading Hangar")
 
   Offline / single-player only. It does not touch or enable online multiplayer.
   Usage:
@@ -115,16 +117,58 @@ if ($SeedOverrides) {
   }
 }
 
-# ---------- modded launch shortcut (EAC off) ----------
+# ---------- Steam context + modded launcher (fixes the "Loading Hangar" hang) ----------
+# Launching BrokenArrow.exe directly (outside a running Steam client) gives the game no Steam
+# context, so its online init blocks forever at the "Loading Hangar" screen (freeze/crash). steam_appid.txt
+# supplies the app id for a non-Steam launch, and the launcher below makes sure the Steam client
+# is running first - so the game boots with EasyAntiCheat off instead of hanging.
+try {
+  Set-Content -Path (Join-Path $game 'steam_appid.txt') -Value '1604270' -Encoding ascii -NoNewline
+  Ok "Wrote steam_appid.txt (Broken Arrow app id 1604270)."
+} catch { Warn ("Couldn't write steam_appid.txt: " + $_.Exception.Message) }
+
+$launcher = Join-Path $game 'Launch Broken Arrow (Modded).bat'
+$launcherBody = @'
+@echo off
+setlocal EnableExtensions
+title Broken Arrow (Modded) Launcher
+cd /d "%~dp0"
+if not exist "%~dp0steam_appid.txt" ( >"%~dp0steam_appid.txt" echo 1604270 )
+REM Make sure Steam is running so the game can get its auth ticket (no ticket = Loading Hangar hang).
+tasklist /FI "IMAGENAME eq steam.exe" 2>nul | find /I "steam.exe" >nul
+if errorlevel 1 (
+    echo Steam is not running - starting it, please sign in if prompted...
+    start "" "steam://open/main"
+    set /a _t=0
+    :w
+    timeout /t 3 /nobreak >nul
+    tasklist /FI "IMAGENAME eq steam.exe" 2>nul | find /I "steam.exe" >nul
+    if not errorlevel 1 goto up
+    set /a _t+=1
+    if %_t% LSS 10 goto w
+    :up
+    timeout /t 5 /nobreak >nul
+)
+REM Launch the raw exe (no EACLauncher) so EasyAntiCheat stays off and MelonLoader loads.
+start "" "%~dp0BrokenArrow.exe"
+endlocal
+'@
+try {
+  Set-Content -Path $launcher -Value $launcherBody -Encoding ascii
+  Ok "Created 'Launch Broken Arrow (Modded).bat'."
+} catch { Warn ("Couldn't write launcher: " + $_.Exception.Message) }
+
+# ---------- modded launch shortcut (EAC off, Steam context on) ----------
 if (-not $NoShortcut) {
   try {
     $lnk = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Broken Arrow (Modded).lnk'
     $ws = New-Object -ComObject WScript.Shell
     $s = $ws.CreateShortcut($lnk)
-    $s.TargetPath = (Join-Path $game 'BrokenArrow.exe')
+    $s.TargetPath = $launcher
     $s.WorkingDirectory = $game
+    $s.WindowStyle = 7   # minimized - hide the brief launcher console
     $s.IconLocation = (Join-Path $game 'BrokenArrow.exe')
-    $s.Description = 'Launch Broken Arrow with mods (EasyAntiCheat off)'
+    $s.Description = 'Launch Broken Arrow with mods (EasyAntiCheat off, Steam context on)'
     $s.Save()
     Ok "Created desktop shortcut: 'Broken Arrow (Modded)'."
   } catch { Warn ("Couldn't create desktop shortcut: " + $_.Exception.Message) }
@@ -133,10 +177,17 @@ if (-not $NoShortcut) {
 Write-Host ''
 Ok "$ModName is installed."
 Write-Host ''
+Write-Host 'DO NOT GET BANNED:' -ForegroundColor Red
+Write-Host '  - Modified stats are server-checked online. Playing ONLINE with mods active'
+Write-Host '    (Skirmish is online by default) can get your account BANNED.'
+Write-Host '  - The modded shortcut runs with anti-cheat OFF, so you are never online with'
+Write-Host '    mods. NEVER use the Steam Play button or EACLauncher.exe while the mod is in'
+Write-Host '    Mods\. To play real online multiplayer, remove Mods\BABalanceMod.dll first.'
+Write-Host ''
 Write-Host 'HOW TO PLAY MODDED:' -ForegroundColor White
-Write-Host '  - Launch with the new "Broken Arrow (Modded)" desktop shortcut, or run'
-Write-Host '    BrokenArrow.exe directly. Do NOT use the Steam Play button - it goes'
-Write-Host '    through EasyAntiCheat, which blocks mods.'
+Write-Host '  - Make sure Steam is running and signed in, then launch with the new'
+Write-Host '    "Broken Arrow (Modded)" desktop shortcut. (Steam must be running or the game'
+Write-Host '    hangs at "Loading Hangar" - the shortcut/launcher handles the rest.)'
 Write-Host '  - The first modded launch is slower (MelonLoader generates game assemblies).'
 Write-Host '  - A black MelonLoader console window opening alongside the game is normal.'
 Write-Host '  - Edit  _BAMod\overrides.json  to change unit stats, then relaunch.'
