@@ -130,24 +130,16 @@ try {
 $launcher = Join-Path $game 'Launch Broken Arrow (Modded).bat'
 $launcherBody = @'
 @echo off
-setlocal EnableExtensions
-title Broken Arrow (Modded) Launcher
+setlocal
 cd /d "%~dp0"
-if not exist "%~dp0steam_appid.txt" ( >"%~dp0steam_appid.txt" echo 1604270 )
+title Broken Arrow (Modded) Launcher
+if not exist "%~dp0steam_appid.txt" (>"%~dp0steam_appid.txt" echo 1604270)
 REM Make sure Steam is running so the game can get its auth ticket (no ticket = Loading Hangar hang).
 tasklist /FI "IMAGENAME eq steam.exe" 2>nul | find /I "steam.exe" >nul
 if errorlevel 1 (
-    echo Steam is not running - starting it, please sign in if prompted...
+    echo Steam is not running - starting it. If prompted, sign in, then it will continue...
     start "" "steam://open/main"
-    set /a _t=0
-    :w
-    timeout /t 3 /nobreak >nul
-    tasklist /FI "IMAGENAME eq steam.exe" 2>nul | find /I "steam.exe" >nul
-    if not errorlevel 1 goto up
-    set /a _t+=1
-    if %_t% LSS 10 goto w
-    :up
-    timeout /t 5 /nobreak >nul
+    timeout /t 12 /nobreak >nul
 )
 REM Launch the raw exe (no EACLauncher) so EasyAntiCheat stays off and MelonLoader loads.
 start "" "%~dp0BrokenArrow.exe"
